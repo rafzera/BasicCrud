@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,11 +8,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.demo.config.exception.ResourceNotFoundException;
 import com.example.demo.entity.PagamentoEntity;
 import com.example.demo.mock.PagamentoEntityMock;
 import com.example.demo.repository.PagamentoRepository;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +30,7 @@ class PagamentoServiceTest {
 
   @Mock
   PagamentoRepository pagamentoRepository;
+
 
   @Test
   void save() {
@@ -90,4 +94,15 @@ class PagamentoServiceTest {
     verify(pagamentoRepository,Mockito.times(1)).delete(any());
 
   }
+
+  @Test
+  void testException(){
+    when(pagamentoRepository.findById(any())).thenReturn(Optional.empty());
+
+    Throwable throwable = catchThrowable(() -> pagamentoService.findById(anyLong()));
+
+    Assertions.assertThat(throwable).isInstanceOf(ResourceNotFoundException.class);
+
+  }
+
 }
