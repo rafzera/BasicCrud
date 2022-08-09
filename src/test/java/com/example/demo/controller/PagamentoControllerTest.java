@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.demo.DemoApplication;
+import com.example.demo.config.exception.ResourceNotFoundException;
 import com.example.demo.entity.PagamentoEntity;
 import com.example.demo.mock.PagamentoEntityMock;
 import com.example.demo.service.PagamentoService;
@@ -128,6 +129,17 @@ public class PagamentoControllerTest {
         .andDo(print())
         .andExpect(status().isOk());
 
+  }
+
+  @Test
+  public void testException() throws Exception {
+
+    when(service.findById(any())).thenThrow(ResourceNotFoundException.class);
+
+    mockMvc.perform(get("/v1/pagamentos/{id}", 8L)
+            .contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
 
